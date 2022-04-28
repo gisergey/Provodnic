@@ -16,11 +16,11 @@ namespace Проводник
             NameFile = new Label();
             PicofFile = new PictureBox();
 
-            MainPanel.Size = new Size(width - 50, 50);
+            MainPanel.Size = new Size(width - 50, 20);
             NameFile.Text = file.Name;
-            NameFile.Location = new Point(50, 5);
+            NameFile.Location = new Point(40, 2);
 
-            PicofFile.Size = new Size(50, 50);
+            PicofFile.Size = new Size(20, 20);
             PicofFile.Location = new Point(0, 0);
 
             PicofFile.BackgroundImage = Properties.Resources.FilePicture;

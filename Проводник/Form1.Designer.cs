@@ -57,7 +57,7 @@ namespace Проводник
             // 
             this.SplitContainer.Panel2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
             this.SplitContainer.Panel2.Controls.Add(this.RigthTextBox);
-            this.SplitContainer.Panel2.Paint += new System.Windows.Forms.PaintEventHandler(this.splitContainer1_Panel2_Paint);
+            this.SplitContainer.Panel2.SizeChanged += new System.EventHandler(this.SplitContainer_Panel2_SizeChanged);
             this.SplitContainer.Panel2MinSize = 100;
             this.SplitContainer.Size = new System.Drawing.Size(1142, 641);
             this.SplitContainer.SplitterDistance = 156;
@@ -89,6 +89,7 @@ namespace Проводник
             this.PanelforCommandbutton.Name = "PanelforCommandbutton";
             this.PanelforCommandbutton.Size = new System.Drawing.Size(1142, 100);
             this.PanelforCommandbutton.TabIndex = 2;
+            this.PanelforCommandbutton.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.PanelforCommandbutton_MouseDoubleClick);
             // 
             // ProvodnicForm
             // 

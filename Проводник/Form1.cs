@@ -12,6 +12,7 @@ using System.Security.AccessControl;
 
 namespace Проводник
 {
+    
     public partial class ProvodnicForm : Form
     {
         List<EmpltyCard> SeeFiles = new List<EmpltyCard>();
@@ -88,8 +89,6 @@ namespace Проводник
                                 DirectoryAdd(noddd, new DirectoryInfo(dir));
 
                             }
-
-
                         }
                     }
                 }
@@ -98,24 +97,35 @@ namespace Проводник
 
         private void DiskTreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
+          
+            RigthTextBox.Text = (string)e.Node.Tag;
+            DirectoryInfo dir = new DirectoryInfo((string)e.Node.Tag);
+            AddPapcas(dir);
+
+
+        }
+        private void AddPapcas(DirectoryInfo dir)
+        {
             for (int i = 0; i < SeeFiles.Count; i++)
             {
                 SplitContainer.Panel2.Controls.Remove(SeeFiles[i].MainPanel);
             }
+            RigthTextBox.Text = dir.FullName;
             SeeFiles.Clear();
-            RigthTextBox.Text = (string)e.Node.Tag;
-            DirectoryInfo dir = new DirectoryInfo((string)e.Node.Tag);
             if (CanIwatchthisdirectoryplease(dir.FullName))
             {
                 foreach (DirectoryInfo subdirs in dir.GetDirectories())
                 {
                     Papcalabel dirpap = new Papcalabel(SplitContainer.Panel2.Size.Width, subdirs);
-
+                    dirpap.MainPanel.MouseDoubleClick += PanelforCommandbutton_MouseDoubleClick;
+                    dirpap.PicofFile.MouseDoubleClick+= PanelforCommandbutton_MouseDoubleClick;
+                    dirpap.NameFile.MouseDoubleClick+= PanelforCommandbutton_MouseDoubleClick;
                     SeeFiles.Add(dirpap);
                 }
-                foreach(FileInfo subfile in dir.GetFiles())
+                foreach (FileInfo subfile in dir.GetFiles())
                 {
                     Filecard filepap = new Filecard(SplitContainer.Panel2.Size.Width, subfile);
+                  
                     SeeFiles.Add(filepap);
                 }
                 if (SeeFiles.Count == 0)
@@ -123,24 +133,82 @@ namespace Проводник
                     SeeFiles.Add(new EmpltyCard());
                 }
             }
-            for(int i = 0; i < SeeFiles.Count; i++)
+            for (int i = 0; i < SeeFiles.Count; i++)
             {
-                SeeFiles[i].MainPanel.Location = new Point(10, 30 + i * 60);
+                SeeFiles[i].MainPanel.Location = new Point(10, 30 + i * 23);
                 SplitContainer.Panel2.Controls.Add(SeeFiles[i].MainPanel);
             }
-
-
-
         }
 
-        private void splitContainer1_Panel2_Paint(object sender, PaintEventArgs e)
-        {
 
-        }
 
         private void ComandButtonPanel_Paint(object sender, PaintEventArgs e)
         {
 
+        }
+
+        private void PanelforCommandbutton_Click(object sender, EventArgs e)
+        {
+            if(sender is Panel)
+            {
+                Panel panel = sender as Panel;
+                if(panel.Tag is DirectoryInfo)
+                {
+                    AddPapcas( panel.Tag as DirectoryInfo);
+                }
+            }
+        }
+
+        private void PanelforCommandbutton_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (sender is Panel)
+            {
+                Panel panel = sender as Panel;
+                foreach(EmpltyCard car in SeeFiles)
+                {
+                    if (car.MainPanel.Equals(panel)&&(car is Papcalabel))
+                    {
+                        Papcalabel pap = car as Papcalabel;
+                        AddPapcas(pap.Direct);
+                        break;
+                    }
+                }
+            }
+            if (sender is PictureBox)
+            {
+                PictureBox panel = sender as PictureBox;
+                foreach (EmpltyCard car in SeeFiles)
+                {
+                    if (car.PicofFile.Equals(panel) && (car is Papcalabel))
+                    {
+                        Papcalabel pap = car as Papcalabel;
+                        AddPapcas(pap.Direct);
+                        break;
+                    }
+                }
+            }
+            if (sender is Label)
+            {
+                Label panel = sender as Label;
+                foreach (EmpltyCard car in SeeFiles)
+                {
+                    if (car.NameFile.Equals(panel) && (car is Papcalabel))
+                    {
+                        Papcalabel pap = car as Papcalabel;
+                        AddPapcas(pap.Direct);
+                        break;
+                    }
+                }
+            }
+
+        }
+
+        private void SplitContainer_Panel2_SizeChanged(object sender, EventArgs e)
+        {
+            foreach(EmpltyCard emp in SeeFiles)
+            {
+                emp.MainPanel.Size = new Size(SplitContainer.Panel2.Width - 50, 20);
+            }
         }
     }
 }
