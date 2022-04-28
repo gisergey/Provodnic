@@ -9,10 +9,11 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Security.AccessControl;
+using System.Threading;
 
 namespace Проводник
 {
-    
+
     public partial class ProvodnicForm : Form
     {
         List<EmpltyCard> SeeFiles = new List<EmpltyCard>();
@@ -24,7 +25,7 @@ namespace Проводник
 
         private void ProvodnicForm_Load(object sender, EventArgs e)
         {
-   
+
             ImageList imageList = new ImageList();
             imageList.Images.Add(Properties.Resources.DirectoryFile);
             imageList.Images.Add(Properties.Resources.FilePicture);
@@ -62,11 +63,6 @@ namespace Проводник
             TreeNode thisdirectory = new TreeNode();
             thisdirectory.Tag = directory.FullName;
             thisdirectory.Text = directory.Name;
-            //if (CanIwatchthisdirectoryplease(directory.FullName))
-            //{
-            //    foreach (string dir in Directory.GetDirectories(directory.FullName))
-            //        DirectoryAdd(thisdirectory, new DirectoryInfo(dir));
-            //}
             whereadd.Nodes.Add(thisdirectory);
 
         }
@@ -97,7 +93,7 @@ namespace Проводник
 
         private void DiskTreeView_AfterSelect(object sender, TreeViewEventArgs e)
         {
-          
+
             RigthTextBox.Text = (string)e.Node.Tag;
             DirectoryInfo dir = new DirectoryInfo((string)e.Node.Tag);
             AddPapcas(dir);
@@ -118,14 +114,14 @@ namespace Проводник
                 {
                     Papcalabel dirpap = new Papcalabel(SplitContainer.Panel2.Size.Width, subdirs);
                     dirpap.MainPanel.MouseDoubleClick += PanelforCommandbutton_MouseDoubleClick;
-                    dirpap.PicofFile.MouseDoubleClick+= PanelforCommandbutton_MouseDoubleClick;
-                    dirpap.NameFile.MouseDoubleClick+= PanelforCommandbutton_MouseDoubleClick;
+                    dirpap.PicofFile.MouseDoubleClick += PanelforCommandbutton_MouseDoubleClick;
+                    dirpap.NameFile.MouseDoubleClick += PanelforCommandbutton_MouseDoubleClick;
                     SeeFiles.Add(dirpap);
                 }
                 foreach (FileInfo subfile in dir.GetFiles())
                 {
                     Filecard filepap = new Filecard(SplitContainer.Panel2.Size.Width, subfile);
-                  
+
                     SeeFiles.Add(filepap);
                 }
                 if (SeeFiles.Count == 0)
@@ -149,12 +145,12 @@ namespace Проводник
 
         private void PanelforCommandbutton_Click(object sender, EventArgs e)
         {
-            if(sender is Panel)
+            if (sender is Panel)
             {
                 Panel panel = sender as Panel;
-                if(panel.Tag is DirectoryInfo)
+                if (panel.Tag is DirectoryInfo)
                 {
-                    AddPapcas( panel.Tag as DirectoryInfo);
+                    AddPapcas(panel.Tag as DirectoryInfo);
                 }
             }
         }
@@ -164,9 +160,9 @@ namespace Проводник
             if (sender is Panel)
             {
                 Panel panel = sender as Panel;
-                foreach(EmpltyCard car in SeeFiles)
+                foreach (EmpltyCard car in SeeFiles)
                 {
-                    if (car.MainPanel.Equals(panel)&&(car is Papcalabel))
+                    if (car.MainPanel.Equals(panel) && (car is Papcalabel))
                     {
                         Papcalabel pap = car as Papcalabel;
                         AddPapcas(pap.Direct);
@@ -205,10 +201,53 @@ namespace Проводник
 
         private void SplitContainer_Panel2_SizeChanged(object sender, EventArgs e)
         {
-            foreach(EmpltyCard emp in SeeFiles)
+            foreach (EmpltyCard emp in SeeFiles)
             {
                 emp.MainPanel.Size = new Size(SplitContainer.Panel2.Width - 50, 20);
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            new CreateDirectory(RigthTextBox.Text).ShowDialog();
+            AddPapcas(new DirectoryInfo(RigthTextBox.Text));
+            DiskTreeView.Nodes.Clear();
+            DriveInfo[] drives = DriveInfo.GetDrives();
+            foreach (DriveInfo drive in drives)
+            {
+                TreeNode node = new TreeNode();
+                node.Text = drive.Name;
+                node.ImageIndex = 2;
+                node.SelectedImageIndex = 2;
+                node.Tag = drive.Name;
+                foreach (string directory in Directory.GetDirectories(drive.Name))
+                    DirectoryAdd(node, new DirectoryInfo(directory));
+                DiskTreeView.Nodes.Add(node);
+            }
+        }
+
+        private void DeleteButton_Click(object sender, EventArgs e)
+        {
+            DialogResult result = MessageBox.Show("Удаление директории", "Вы точно хотите удалить данную директорию", MessageBoxButtons.YesNo);
+            if (result.Equals(DialogResult.Yes))
+            {
+                Directory.Delete(RigthTextBox.Text, true);
+            }
+            AddPapcas(new DirectoryInfo(RigthTextBox.Text));
+            DiskTreeView.Nodes.Clear();
+            DriveInfo[] drives = DriveInfo.GetDrives();
+            foreach (DriveInfo drive in drives)
+            {
+                TreeNode node = new TreeNode();
+                node.Text = drive.Name;
+                node.ImageIndex = 2;
+                node.SelectedImageIndex = 2;
+                node.Tag = drive.Name;
+                foreach (string directory in Directory.GetDirectories(drive.Name))
+                    DirectoryAdd(node, new DirectoryInfo(directory));
+                DiskTreeView.Nodes.Add(node);
+            }
+
         }
     }
 }
